@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block title %}Upload Video - {{ course.title }}{% endblock %}
+{% block content %}
+<div class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="mb-0">Upload Video</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-2">Course: <strong>{{ course.title }}</strong></p>
+                        <p class="text-muted mb-4">Section: <strong>{{ section.title }}</strong></p>
+
+                        <div class="alert alert-info">
+                            <h5>Upload Requirements:</h5>
+                            <ul class="mb-0 mt-2">
+                                <li><strong>Format:</strong> MP4 only (.mp4 files)</li>
+                                <li><strong>Max Size:</strong> 500 MB</li>
+                                <li><strong>Codec:</strong> H.264 video + AAC audio recommended</li>
+                                <li><strong>Resolution:</strong> 720p or higher recommended</li>
+                                <li><strong>⭐ Auto-detection:</strong> Duration will be detected automatically from video file</li>
+                            </ul>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <strong>Important:</strong> The upload may take several minutes for large files.
+                            Do not close this page until upload is complete. Duration will be automatically detected from the video file.
+                        </div>
+
+                        <form method="POST" enctype="multipart/form-data" id="videoUploadForm">
+                            {% csrf_token %}
+
+                            <div class="mb-3">
+                                <label for="{{ form.title.id_for_label }}" class="form-label">Video Title *</label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                    <div class="alert alert-danger mt-2">{{ form.title.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                    <div class="alert alert-danger mt-2">{{ form.description.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.video_file.id_for_label }}" class="form-label">Video File * (MP4 only)</label>
+                                {{ form.video_file }}
+                                <small class="form-text text-muted">Maximum file size: 500 MB. The video will be fully uploaded and validated.</small>
+                                {% if form.video_file.errors %}
+                                    <div class="alert alert-danger mt-2">{{ form.video_file.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.duration_minutes.id_for_label }}" class="form-label">Duration (Minutes)</label>
+                                {{ form.duration_minutes }}
+                                <small class="form-text text-muted">Leave blank for automatic detection</small>
+                                {% if form.duration_minutes.errors %}
+                                    <div class="alert alert-danger mt-2">{{ form.duration_minutes.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.order.id_for_label }}" class="form-label">Video Order</label>
+                                {{ form.order }}
+                                {% if form.order.errors %}
+                                    <div class="alert alert-danger mt-2">{{ form.order.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div id="uploadStatus" style="display: none;">
+                                <div class="alert alert-info">
+                                    <p>Uploading video... <span id="uploadPercent">0</span>%</p>
+                                    <div class="progress">
+                                        <div id="uploadProgress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-success" id="uploadBtn">Upload Video</button>
+                                <a href="{% url 'course_detail' course.id %}" class="btn btn-secondary">Cancel</a>
+                            </div>
+
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger mt-3">{{ form.non_field_errors }}</div>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('videoUploadForm').addEventListener('submit', function(e) {
+        const fileInput = document.querySelector('input[name="video_file"]');
+        const file = fileInput.files[0];
+
+        if (file) {
+            const maxSize = 500 * 1024 * 1024; // 500 MB
+
+            if (file.size > maxSize) {
+                e.preventDefault();
+                alert('File size exceeds 500 MB limit. Please choose a smaller file.');
+                return false;
+            }
+
+            if (!file.name.toLowerCase().endsWith('.mp4')) {
+                e.preventDefault();
+                alert('Only MP4 files are allowed. Please select an MP4 video file.');
+                return false;
+            }
+
+            // Show status
+            document.getElementById('uploadStatus').style.display = 'block';
+            document.getElementById('uploadBtn').disabled = true;
+            document.getElementById('uploadBtn').textContent = 'Uploading...';
+        }
+    });
+
+    // Monitor upload progress
+    document.querySelector('input[name="video_file"]').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+            console.log('Selected file: ' + file.name + ' (' + sizeMB + ' MB)');
+        }
+    });
+</script>
+{% endblock %}
+

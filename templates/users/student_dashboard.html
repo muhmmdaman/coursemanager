@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Student Dashboard{% endblock %}
+{% block content %}
+<div class="py-5">
+    <div class="container">
+        <h1 class="mb-4">My Learning</h1>
+        <div class="row g-4">
+            {% for enrollment in enrolled_courses %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm">
+                        <div style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                        <div class="card-body">
+                            <h5>{{ enrollment.course.title }}</h5>
+                            <p class="text-muted">{{ enrollment.course.instructor.get_full_name }}</p>
+                            <p class="text-warning">⭐ {{ enrollment.course.get_average_rating }}</p>
+                            <a href="{% url 'course_detail' enrollment.course.id %}" class="btn btn-primary btn-sm">Continue</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <p>No enrolled courses. <a href="{% url 'course_list' %}">Browse courses</a></p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

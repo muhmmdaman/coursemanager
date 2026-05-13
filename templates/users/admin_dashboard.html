@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="py-5">
+    <div class="container">
+        <h1 class="mb-4">Admin Dashboard</h1>
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h5>Users</h5>
+                        <h2>{{ users_count }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5>Courses</h5>
+                        <h2>{{ courses_count }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <h5>Enrollments</h5>
+                        <h2>{{ enrollments_count }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h5>Reviews</h5>
+                        <h2>{{ reviews_count }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p><a href="/admin/" class="btn btn-primary">Go to Admin Panel</a></p>
+    </div>
+</div>
+{% endblock %}

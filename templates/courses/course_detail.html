@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block title %}{{ course.title }}{% endblock %}
+{% block content %}
+<div class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div style="height: 400px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; margin-bottom: 30px; display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 120px;">📚</span>
+                </div>
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h1>{{ course.title }}</h1>
+                        <p class="text-warning">⭐ {{ course.get_average_rating }} ({{ course.get_review_count }})</p>
+                        <p class="text-muted">By {{ course.instructor.get_full_name }}</p>
+                        <hr>
+                        <h4>About</h4>
+                        <p>{{ course.description }}</p>
+                        <div class="row mt-4">
+                            <div class="col-md-6"><h6>Duration</h6><p>{{ course.duration_hours }}h</p></div>
+                            <div class="col-md-6"><h6>Level</h6><p>{{ course.get_level_display }}</p></div>
+                            <div class="col-md-6"><h6>Category</h6><p>{{ course.category.name }}</p></div>
+                            <div class="col-md-6"><h6>Price</h6><p>{% if course.price == 0 %}FREE{% else %}₹{{ course.price|floatformat:0 }}{% endif %}</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if course.sections.all %}
+                <div class="card shadow-sm border-0 mt-4">
+                    <div class="card-header bg-light">
+                        <h4 class="mb-0">📝 Course Content</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="accordion" id="courseSections">
+                            {% for section in course.sections.all %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#section{{ section.id }}">
+                                        {{ section.title }}
+                                        {% if user_enrolled %}<small class="text-muted ms-2">({{ section.videos.count }} video{{ section.videos.count|pluralize }})</small>{% endif %}
+                                    </button>
+                                </h2>
+                                <div id="section{{ section.id }}" class="accordion-collapse collapse" data-bs-parent="#courseSections">
+                                    <div class="accordion-body">
+                                        {% if section.description %}<p class="text-muted">{{ section.description }}</p>{% endif %}
+                                        <div class="list-group">
+                                            {% for video in section.videos.all %}
+                                            <div class="list-group-item">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h6 class="mb-1">🎥 {{ video.title }}</h6>
+                                                        {% if video.duration_minutes %}<small class="text-muted">⏱️ {{ video.duration_minutes }} min</small>{% endif %}
+                                                    </div>
+                                                    {% if user_enrolled %}
+                                                    <a href="{% url 'watch_video' video.id %}" class="btn btn-sm btn-outline-primary">Watch</a>
+                                                    {% elif course.instructor == user %}
+                                                    <a href="{% url 'watch_video' video.id %}" class="btn btn-sm btn-outline-primary">Preview</a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            {% empty %}
+                                            <p class="text-muted">No videos yet</p>
+                                            {% endfor %}
+                                        </div>
+                                        {% if course.instructor == user %}
+                                        <hr>
+                                        <a href="{% url 'upload_video' section.id %}" class="btn btn-sm btn-success">+ Upload Video</a>
+                                        <a href="{% url 'edit_section' section.id %}" class="btn btn-sm btn-warning">Edit Section</a>
+                                        <form method="post" action="{% url 'delete_section' section.id %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this section?')">Delete</button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if course.instructor == user %}
+                <a href="{% url 'add_section' course.id %}" class="btn btn-primary mt-4">+ Add New Section</a>
+                {% endif %}
+            </div>
+            <div class="col-lg-4">
+                <div class="card shadow-lg border-0 sticky-top" style="top: 20px;">
+                    <div class="card-body">
+                        <h3 class="mb-4">{% if course.price == 0 %}<span class="badge bg-success">FREE</span>{% else %}₹{{ course.price|floatformat:0 }}{% endif %}</h3>
+                        {% if user.is_authenticated %}
+                            {% if user_enrolled %}
+                                <div class="alert alert-success">✅ Enrolled</div>
+                                <a href="{% url 'add_review' course.id %}" class="btn btn-primary w-100 mb-2">Review</a>
+                                <form method="post" action="{% url 'unenroll_course' course.id %}">
+                                    {% csrf_token %}
+                                    <button class="btn btn-danger w-100">Unenroll</button>
+                                </form>
+                            {% else %}
+                                <form method="post" action="{% url 'enroll_course' course.id %}">
+                                    {% csrf_token %}
+                                    <button class="btn btn-primary w-100 btn-lg">Enroll</button>
+                                </form>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'signup' %}" class="btn btn-primary w-100 btn-lg">Sign Up</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

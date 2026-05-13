@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Courses{% endblock %}
+{% block content %}
+<div class="py-6" style="padding: 60px 0;">
+    <div class="container">
+        <h1 class="text-gradient mb-2" style="font-size: 2.5rem; font-weight: 900;">
+            <i class="fas fa-graduation-cap"></i> Explore All Courses
+        </h1>
+        <p class="text-muted mb-5" style="font-size: 1.1rem;">
+            Browse our comprehensive selection of premium courses across multiple disciplines.
+        </p>
+
+        <div class="card shadow-lg mb-5" style="border-radius: 16px; border: none;">
+            <div class="card-body p-4">
+                <form method="get" class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label fw-700 mb-2"><i class="fas fa-search"></i> Search Courses</label>
+                        <input type="text" name="search" class="form-control" placeholder="Search by title..." value="{{ search_query }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-700 mb-2"><i class="fas fa-folder"></i> Category</label>
+                        <select name="category" class="form-select">
+                            <option value="">All Categories</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-700 mb-2"><i class="fas fa-tag"></i> Price</label>
+                        <select name="price_filter" class="form-select">
+                            <option value="">All Prices</option>
+                            <option value="free">Free</option>
+                            <option value="paid">Paid</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100" style="border-radius: 12px;">
+                            <i class="fas fa-filter"></i> Filter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% for course in courses %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card course-card">
+                        <div class="course-card-image">
+                            <span>📚</span>
+                        </div>
+                        <div class="course-card-body">
+                            <div class="mb-3">
+                                <span class="badge {% if course.price == 0 %}badge-free{% else %}badge-paid{% endif %}">
+                                    {% if course.price == 0 %}<i class="fas fa-gift"></i> FREE{% else %}₹{{ course.price|floatformat:0 }}{% endif %}
+                                </span>
+                            </div>
+                            <h5 class="course-title">{{ course.title }}</h5>
+                            <p class="text-muted small mb-3">{{ course.description|truncatewords:12 }}</p>
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <span class="course-rating">⭐ {{ course.get_average_rating }}</span>
+                                <small class="text-muted"><i class="fas fa-users"></i> {{ course.students_count }}</small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-0 pt-0">
+                            <a href="{% url 'course_detail' course.id %}" class="btn btn-primary btn-sm w-100" style="border-radius: 12px;">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center" style="border-radius: 16px; padding: 40px;">
+                        <i class="fas fa-search" style="font-size: 2.5rem; color: #3b82f6; margin-bottom: 15px;"></i>
+                        <h5>No Courses Found</h5>
+                        <p class="text-muted">Try adjusting your filters or search terms</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+# Core Django Requirements for Course Hub
+
+# Framework
+Django==4.2.11
+
+# Image Processing
+Pillow==11.0.0
+
+# Forms & UI
+django-crispy-forms==2.3
+crispy-bootstrap5==2026.3
+
+# REST Framework
+djangorestframework==3.14.0
+
+# Development Tools
+django-extensions==4.1
+python-dotenv==1.0.0
+python-decouple==3.8
+
+# Web Servers
+gunicorn==21.2.0
+whitenoise==6.12.0
+
+# Testing
+pytest==9.0.2
+pytest-django==4.12.0
+
+# Security
+django-cors-headers==4.3.1
+
+# Database
+psycopg2-binary==2.9.10
